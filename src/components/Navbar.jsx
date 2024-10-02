@@ -22,7 +22,7 @@ const Navbar = () => {
         <div className='rightSide'>
             <Link to='/'>Home</Link>
             <Link to='/how-it-works'>How it works</Link>
-            <button className='sign-up-button'>Sign-up</button>
+            <Link to='sign-up'>Sign-up</Link>
             <div className='toggleButton' onClick={toggleNavbar}>
                 {openLinks ? <AiOutlineClose /> : <AiOutlineMenu />}
             </div>

@@ -39,25 +39,15 @@
 
 
 
-.navbar .rightSide button {
-    background-color: #3B3030;
-    border: none;
-    color: white;
-    cursor: pointer;
-    border-radius: 10px;
-    padding: 10px;
-}
+
 
 .navbar .rightSide svg {
-    font-size: 40px;
+    font-size: 30px;
+        color: #e3dbd3;
+        padding-top: 10px;
+        padding-left: 10px;
 }
 
-
-
-.navbar .toggleButton {
-    font-size: 5px;
-
-}
 
 
 .navbar #open .hiddenLinks {
@@ -80,8 +70,7 @@
 
 @media only screen and (max-width: 768px) {
 
-    .navbar .rightSide a,
-    .navbar .rightSide button {
+    .navbar .rightSide a {
         display: none;
     }
 
@@ -130,6 +119,7 @@
     }
 
     .navbar #open h1 {
-        display: inherit;
+        display: block;
+            padding-left: 80px;
     }
 }
