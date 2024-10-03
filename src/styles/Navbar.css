@@ -1,9 +1,17 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    /* Helps with consistent sizing */
+}
 .navbar {
     width: 100%;
     height: 100px;
     background-color: #664343;
     display: flex;
     flex-direction: row;
+    padding-bottom: 0px;
+        margin-bottom: 0px;
 }
 
 .navbar .leftSide {
@@ -119,7 +127,7 @@
     }
 
     .navbar #open h1 {
-        display: block;
+        display: flex;
             padding-left: 80px;
     }
 }
