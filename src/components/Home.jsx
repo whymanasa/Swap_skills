@@ -15,6 +15,7 @@ function Home() {
         
         <img src={image} alt="hero image" className="image2"/>
         <img src={img} alt="hero image" className="image1" />
+        <p>ʕ⁠⁠ꈍ⁠ᴥ⁠ꈍ⁠ʔ</p>
         </div>
     </div>
   );
