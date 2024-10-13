@@ -12,6 +12,7 @@ function App() {
           {/* <Route path="/how-it-works" element={<HowItWorks />} />
           <Route path="/sign-up" element={<SignUp />} /> */}
         </Routes>
+        
       </div>
     </Router>
   );
