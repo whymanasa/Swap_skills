@@ -1,13 +1,14 @@
 import { auth } from "../firebase-config";
 import React, { useState } from "react";
-import {createUserWithEmailAndPassword } from "firebase/auth";
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import "../styles/Sign_up.css";
 
 const SignUp = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
@@ -18,9 +19,19 @@ const SignUp = () => {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
       console.log("User registered:", user);
+
+      // Log in the user immediately after sign-up
+      await signInWithEmailAndPassword(auth, email, password);
+
+      // Redirect to the profile page after successful sign-up and login
+      navigate('/profile');
     } catch (err) {
       // Handle errors
-      setError(err.message);
+      if (err.code === 'auth/email-already-in-use') {
+        setError("This email address is already in use. Please use a different email.");
+      } else {
+        setError(err.message); // Handle other errors
+      }
       console.error("Error during sign up:", err);
     }
   };
@@ -44,16 +55,12 @@ const SignUp = () => {
 
         <div className="input-box">
           <input
-            type={showPassword ? "text" : "password"}
+            type="password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Enter your password"
             required
           />
-          <i
-            className={`uil ${showPassword ? "uil-eye" : "uil-eye-slash"}`}
-            onClick={() => setShowPassword(!showPassword)}
-          ></i>
         </div>
 
         <button type="submit" className="signup-btn">Sign Up</button>
