@@ -13,14 +13,16 @@ const Navbar = ({ isAuthenticated }) => {
     // Define links based on authentication status
     const links = isAuthenticated
         ? [
-            { to: '/message', label: 'Message' },
+            
             { to: '/search', label: 'Search' },
+            { to: '/message', label: 'Message' },
             { to: '/profile', label: 'Profile' }
           ]
         : [
-            { to: '/sign-up', label: 'Sign Up' },
+            
             { to: '/', label: 'Home' },
-            { to: '/how-it-works', label: 'How it works' }
+            { to: '/how-it-works', label: 'How it works' },
+            { to: '/sign-up', label: 'Sign Up' }
           ];
 
     return (
