@@ -4,46 +4,48 @@ import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "fire
 import { useNavigate } from "react-router-dom";
 import "../styles/Sign_up.css";
 
-const SignUp = () => {
+const SignUp = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
 
   const handleSignUp = async (e) => {
     e.preventDefault();
-    setError(null); // Clear any previous errors
+    setError(null);
 
     try {
-      // Firebase sign up with email and password using async/await
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      console.log("User registered:", user);
-
-      // Log in the user immediately after sign-up
+      await createUserWithEmailAndPassword(auth, email, password);
       await signInWithEmailAndPassword(auth, email, password);
-
-      // Redirect to the profile page after successful sign-up and login
+      onLogin();
       navigate('/profile');
     } catch (err) {
-      // Handle errors
-      if (err.code === 'auth/email-already-in-use') {
-        setError("This email address is already in use. Please use a different email.");
-      } else {
-        setError(err.message); // Handle other errors
-      }
-      console.error("Error during sign up:", err);
+      setError(err.code === 'auth/email-already-in-use' 
+        ? "This email address is already in use. Please use a different email." 
+        : err.message);
+    }
+  };
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    setError(null);
+
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      onLogin();
+      navigate('/profile');
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
     <div className="signup-container">
-      <form onSubmit={handleSignUp} className="signup-form">
-        <h2>Sign Up</h2>
-
-        {error && <p className="error">{error}</p>}
-
-        <div className="input-box">
+      {isLogin ? (
+        <form onSubmit={handleLogin} className="signup-form">
+          <h2>Log In</h2>
+          {error && <p className="error">{error}</p>}
           <input
             type="email"
             value={email}
@@ -51,9 +53,6 @@ const SignUp = () => {
             placeholder="Enter your email"
             required
           />
-        </div>
-
-        <div className="input-box">
           <input
             type="password"
             value={password}
@@ -61,10 +60,35 @@ const SignUp = () => {
             placeholder="Enter your password"
             required
           />
-        </div>
-
-        <button type="submit" className="signup-btn">Sign Up</button>
-      </form>
+          <button type="submit" className="signup-btn">Log In</button>
+          <p className="toggle-form">
+            Don't have an account? <span onClick={() => setIsLogin(false)} className="toggle-link">Sign Up</span>
+          </p>
+        </form>
+      ) : (
+        <form onSubmit={handleSignUp} className="signup-form">
+          <h2>Sign Up</h2>
+          {error && <p className="error">{error}</p>}
+          <input
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter your email"
+            required
+          />
+          <input
+            type="password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Enter your password"
+            required
+          />
+          <button type="submit" className="signup-btn">Sign Up</button>
+          <p className="toggle-form">
+            Already have an account? <span onClick={() => setIsLogin(true)} className="toggle-link">Log In</span>
+          </p>
+        </form>
+      )}
     </div>
   );
 };
