@@ -21,6 +21,7 @@ const App = () => {
       setIsAuthenticated(!!user); // Set to true if user exists, false otherwise
       setLoading(false);
     });
+    
 
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
@@ -32,6 +33,9 @@ const App = () => {
   const handleLogout = () => {
     setIsAuthenticated(false);
   };
+  if (loading) {
+    return <div>Loading...</div>; // Show a loading message or spinner
+  }
 
   return (
     <Router>
