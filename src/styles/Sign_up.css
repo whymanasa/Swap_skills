@@ -7,16 +7,14 @@
     font-family: "Poppins", sans-serif;
 }
 
-body {
-    background-color: #f0f0f0;
-}
+
 
 .signup-container {
     display: flex;
     justify-content: center;
     align-items: center;
     height: 100vh;
-    background-color: #f7f7f7;
+    background-color: #3b3030;
 }
 
 .signup-form {
