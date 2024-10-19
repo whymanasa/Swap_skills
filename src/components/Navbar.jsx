@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { AiOutlineMenu, AiOutlineClose } from "react-icons/ai";
 
+
 const Navbar = () => {
     const [openLinks, setOpenLinks] = useState(false);
     const toggleNavbar = () => {
@@ -15,13 +16,14 @@ const Navbar = () => {
             <h1>SWAP'em.</h1>
             <div className='hiddenLinks'>
                 <Link to='/'>Home</Link>
-                <Link to='/how-it-works'>How it works</Link>
+                <Link to="/About">How it works</Link>
                 <Link to='sign-up'>Sign-up</Link>
             </div>
+            
         </div>
         <div className='rightSide'>
             <Link to='/'>Home</Link>
-            <Link to='/how-it-works'>How it works</Link>
+            <Link to='/About'>How it works</Link>
             <Link to='sign-up'>Sign-up</Link>
             <div className='toggleButton' onClick={toggleNavbar}>
                 {openLinks ? <AiOutlineClose /> : <AiOutlineMenu />}
