@@ -41,7 +41,7 @@ const App = () => {
     <Router>
       <div>
         <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
-        <Footer/>
+        
         <Routes>
           <Route path="/" element={<Home />} />
           {/* <Route path="/how-it-works" element={<HowItWorks />} />*/}
@@ -82,6 +82,7 @@ const App = () => {
         </Routes>
         
       </div>
+      <Footer/>
     </Router>
   );
 }

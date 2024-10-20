@@ -21,7 +21,11 @@ function Profile({ onLogout }) {
   return (
     <div className='profile-container'>
       <div className="content">
-      <h1>It's the Profile</h1>
+      <h1>Profile</h1>
+      <label>name</label>
+      <input type='text' placeholder='enter your name'></input>
+      <input type='message' placeholder='about yourself'></input>
+      <input type='text' placeholder='enter your skill'></input>
       <button onClick={handleLogout}>Logout</button>
       <Link to={'/mainpage'}>
       <button>done</button>
