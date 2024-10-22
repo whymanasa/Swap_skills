@@ -4,8 +4,8 @@ import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { db } from '../firebase-config'; // Import Firestore
-import { collection, addDoc, getDocs, doc, updateDoc, getDoc } from 'firebase/firestore';
-import { FaCheck } from 'react-icons/fa'; // Import the tick icon from react-icons
+import { collection, addDoc, getDocs, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { FaCheck, FaTimes } from 'react-icons/fa'; // Import the tick and delete icons from react-icons
 import "../styles/Profile.css";
 
 function Profile({ onLogout }) {
@@ -54,12 +54,54 @@ function Profile({ onLogout }) {
     }
   };
 
+  const handleDeleteSkill = async (skillToDelete) => {
+    try {
+      const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
+      // Filter out the skill to delete
+      const updatedSkills = skillsList.filter(skill => skill !== skillToDelete);
+      // Update the skills array in Firestore
+      await updateDoc(userDoc, {
+        skills: updatedSkills, // Set the updated skills array
+      });
+      setSkillsList(updatedSkills); // Update local state
+    } catch (error) {
+      console.error('Error deleting skill: ', error);
+    }
+  };
+
   const fetchSkills = async () => {
     const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
     const userSnapshot = await getDoc(userDoc);
     if (userSnapshot.exists()) {
       const data = userSnapshot.data();
       setSkillsList(data.skills || []); // Set skillsList to the skills array or an empty array
+    }
+  };
+
+  const handleDone = async () => {
+    try {
+      const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
+      // Check if the document exists
+      const userSnapshot = await getDoc(userDoc);
+      if (userSnapshot.exists()) {
+        // Update the existing document
+        await updateDoc(userDoc, {
+          name: name,
+          description: description,
+        });
+        console.log('Profile updated successfully on Done');
+      } else {
+        // Create a new document if it doesn't exist
+        await setDoc(userDoc, {
+          name: name,
+          description: description,
+          skills: skillsList, // Include skills if needed
+        });
+        console.log('Profile created successfully on Done');
+      }
+      navigate('/mainpage'); // Navigate to the main page after saving
+    } catch (error) {
+      console.error('Error saving profile on Done: ', error);
     }
   };
 
@@ -112,14 +154,18 @@ function Profile({ onLogout }) {
         <h2>Your Skills:</h2>
         <ul>
           {skillsList.map((skill, index) => (
-            <li key={index}>{skill}</li>
+            <li key={index}>
+              {skill} 
+              <FaTimes 
+                onClick={() => handleDeleteSkill(skill)} 
+                style={{ cursor: 'pointer', color: 'red', marginLeft: '10px' }} 
+              /> {/* Delete icon */}
+            </li>
           ))}
         </ul>
 
         <button onClick={handleLogout}>Logout</button>
-        <Link to={'/mainpage'}>
-          <button>Done</button>
-        </Link>
+        <button onClick={handleDone}>Done</button> {/* Call handleDone on click */}
       </div>
     </div>
   )
