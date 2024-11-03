@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { auth } from '../firebase-config'
 import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { db } from '../firebase-config'; // Import Firestore
-import { collection, addDoc, getDocs, doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
+import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { FaCheck, FaTimes } from 'react-icons/fa'; // Import the tick and delete icons from react-icons
 import "../styles/Profile.css";
 
@@ -14,6 +14,7 @@ function Profile({ onLogout }) {
   const [description, setDescription] = useState('')
   const [skill, setSkill] = useState('')
   const [skillsList, setSkillsList] = useState([]) // State to hold skills
+  const [loading, setLoading] = useState(false) // Loading state
 
   const handleLogout = async () => {
     try {
@@ -25,99 +26,69 @@ function Profile({ onLogout }) {
     }
   }
 
-  const handleSave = async () => {
-    try {
-      const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
-      await updateDoc(userDoc, {
-        name: name,
-        description: description,
-      });
-      console.log('Profile updated successfully');
-    } catch (error) {
-      console.error('Error updating profile: ', error);
-    }
-  }
-
-  const handleAddSkill = async () => {
-    if (skill) {
-      try {
-        const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
-        // Update the skills array in Firestore
-        await updateDoc(userDoc, {
-          skills: [...skillsList, skill], // Add the new skill to the existing array
-        });
-        setSkill(''); // Clear the input field
-        fetchSkills(); // Refresh the skills list
-      } catch (error) {
-        console.error('Error adding skill: ', error);
-      }
-    }
-  };
-
-  const handleDeleteSkill = async (skillToDelete) => {
-    try {
-      const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
-      // Filter out the skill to delete
-      const updatedSkills = skillsList.filter(skill => skill !== skillToDelete);
-      // Update the skills array in Firestore
-      await updateDoc(userDoc, {
-        skills: updatedSkills, // Set the updated skills array
-      });
-      setSkillsList(updatedSkills); // Update local state
-    } catch (error) {
-      console.error('Error deleting skill: ', error);
-    }
-  };
-
-  const fetchSkills = async () => {
-    const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
-    const userSnapshot = await getDoc(userDoc);
+  const fetchUserData = useCallback(async () => {
+    setLoading(true)
+    const userDoc = doc(db, 'profile', auth.currentUser.uid)
+    const userSnapshot = await getDoc(userDoc)
     if (userSnapshot.exists()) {
-      const data = userSnapshot.data();
-      setSkillsList(data.skills || []); // Set skillsList to the skills array or an empty array
+      const data = userSnapshot.data()
+      setName(data.name)
+      setDescription(data.description)
+      setSkillsList(data.skills || [])
     }
-  };
+    setLoading(false)
+  }, [])
 
-  const handleDone = async () => {
+  const handleProfileUpdate = async () => {
     try {
       const userDoc = doc(db, 'profile', auth.currentUser.uid); // Reference the 'profile' collection
-      // Check if the document exists
-      const userSnapshot = await getDoc(userDoc);
+      const userSnapshot = await getDoc(userDoc); // Check if the document exists
+
       if (userSnapshot.exists()) {
         // Update the existing document
         await updateDoc(userDoc, {
-          name: name,
-          description: description,
+          name,
+          description,
+          skills: skillsList, // Update skills as well
         });
-        console.log('Profile updated successfully on Done');
+        console.log('Profile updated successfully');
       } else {
         // Create a new document if it doesn't exist
         await setDoc(userDoc, {
-          name: name,
-          description: description,
+          name,
+          description,
           skills: skillsList, // Include skills if needed
         });
-        console.log('Profile created successfully on Done');
+        console.log('Profile created successfully');
       }
-      navigate('/mainpage'); // Navigate to the main page after saving
     } catch (error) {
-      console.error('Error saving profile on Done: ', error);
+      console.error('Error updating profile: ', error);
     }
   };
 
-  useEffect(() => {
-    // Fetch user data (name and description) from Firestore
-    const fetchUserData = async () => {
-      const userDoc = doc(db, 'profile', auth.currentUser.uid) // Reference the 'profile' collection
-      const userSnapshot = await getDoc(userDoc)
-      if (userSnapshot.exists()) {
-        setName(userSnapshot.data().name)
-        setDescription(userSnapshot.data().description)
-      }
+  const handleAddSkill = async () => {
+    if (skill) {
+      const updatedSkills = [...skillsList, skill]
+      setSkillsList(updatedSkills)
+      setSkill('') // Clear the input field
+      await handleProfileUpdate() // Update Firestore
     }
-    fetchUserData()
-    fetchSkills() // Fetch skills when the component mounts
-  }, [])
+  }
+
+  const handleDeleteSkill = async (skillToDelete) => {
+    const updatedSkills = skillsList.filter(s => s !== skillToDelete)
+    setSkillsList(updatedSkills)
+    await handleProfileUpdate() // Update Firestore
+  }
+
+  const handleDone = async () => {
+    await handleProfileUpdate() // Update profile and skills
+    navigate('/mainpage') // Navigate to the main page after saving
+  }
+
+  useEffect(() => {
+    fetchUserData() // Fetch user data when the component mounts
+  }, [fetchUserData])
 
   return (
     <div className='profile-container'>
@@ -131,7 +102,7 @@ function Profile({ onLogout }) {
           onChange={(e) => setName(e.target.value)} 
           placeholder='Enter your name' 
         />
-        <FaCheck onClick={handleSave} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
+        <FaCheck onClick={handleProfileUpdate} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
         
         <label>Description</label>
         <input 
@@ -140,7 +111,7 @@ function Profile({ onLogout }) {
           onChange={(e) => setDescription(e.target.value)} 
           placeholder='About yourself' 
         />
-        <FaCheck onClick={handleSave} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
+        <FaCheck onClick={handleProfileUpdate} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
         
         <label>Skill</label>
         <input 
@@ -166,6 +137,7 @@ function Profile({ onLogout }) {
 
         <button onClick={handleLogout}>Logout</button>
         <button onClick={handleDone}>Done</button> {/* Call handleDone on click */}
+        {loading && <p>Loading...</p>} {/* Loading indicator */}
       </div>
     </div>
   )
