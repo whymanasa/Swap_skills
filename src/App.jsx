@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route , Link} from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Footer from './components/footer';
@@ -11,6 +11,7 @@ import { auth } from './firebase-config.jsx'; // Import your Firebase auth
 import { onAuthStateChanged } from 'firebase/auth';
 import ProtectedRoute from './helpers/protectedRoute.jsx';
 import MainPage from './components/MainPage.jsx'; // Update import to MainPage
+import About from './components/About';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -92,6 +93,7 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+          <Route path="/how-it-works" element={<About />} />
         </Routes>
         
       </div>
