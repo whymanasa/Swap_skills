@@ -154,7 +154,7 @@ h3{
   
 }
 .list{
- 
+ background-image: url('Banner2.jpg');
 
 ul {
   margin: 0px;
@@ -168,9 +168,9 @@ ul li {
   text-align:center;
   font-size: 30px;
   
-  background:linear-gradient( #795757, #cab0b0);
+  background:linear-gradient( #3e2d2d, #b7a0a0);
   color:#231919;
-  font-family: cursive;
+  font-family:Arial, Helvetica, sans-serif;
   margin: 30px;
   padding: 40px;
   border-radius: 10px;
