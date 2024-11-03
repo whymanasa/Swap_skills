@@ -42,8 +42,7 @@ const MainPage = ({ currentUserId }) => {
             ))}
           </ul>
           <button>send request</button>
-          
-          <br/>
+
         </div>
       ))}
     </div>

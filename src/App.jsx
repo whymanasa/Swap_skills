@@ -64,7 +64,7 @@ const App = () => {
             path="/mainpage" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <MainPage currentUserId={currentUserId} /> {/* Pass current user ID */}
+                <MainPage currentUserId={currentUserId} onLogout={handleLogout} /> {/* Pass current user ID */}
               </ProtectedRoute>
             } 
           />
@@ -72,7 +72,7 @@ const App = () => {
             path="/search" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Search onLogout={handleLogout} />
+                <Search onLogout={handleLogout} currentUserId={currentUserId}/>
               </ProtectedRoute>
             } 
           />
