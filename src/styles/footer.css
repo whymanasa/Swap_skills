@@ -1,0 +1,26 @@
+footer{
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 45px;
+      align-items: center;
+
+
+   }
+   
+   .footer{
+      color: #f4f4f4;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-around;
+}
+
+  .footer a:hover{
+    text-decoration: underline;
+
+   }
