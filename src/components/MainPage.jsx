@@ -29,22 +29,23 @@ const MainPage = ({ currentUserId }) => {
   }, [currentUserId]);
 
   return (
-    <div>
-      <h2>Other Users' Profiles</h2>
-      {userProfiles.map(profile => (
-        <div key={profile.id} className="user-profile">
-          <h3>{profile.name}</h3>
-          <p>Description: {profile.description}</p>
-          <h4>Skills:</h4>
-          <ul>
-            {profile.skills && profile.skills.map((skill, index) => (
-              <li key={index}>{skill}</li>
-            ))}
-          </ul>
-          <button>send request</button>
-
-        </div>
-      ))}
+    <div className="main-page">
+      <h2>Explore Other Users' Profiles</h2>
+      <div className="profiles-container">
+        {userProfiles.map(profile => (
+          <div key={profile.id} className="user-profile">
+            <h3>{profile.name}</h3>
+            <p className="profile-description">{profile.description}</p>
+            <h4>Skills:</h4>
+            <ul>
+              {profile.skills && profile.skills.map((skill, index) => (
+                <li key={index}>{skill}</li>
+              ))}
+            </ul>
+            <button className="request-button">Send Request</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
