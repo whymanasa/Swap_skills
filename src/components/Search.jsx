@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { db } from '../firebase-config'; // Import Firestore
+import { db } from '../../firebase-config'; // Import Firestore
 import { collection, getDocs } from 'firebase/firestore';
 
 function Search({ currentUserId }) {

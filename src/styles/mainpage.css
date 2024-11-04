@@ -1,0 +1,97 @@
+/* Main background color */
+body {
+    margin: 0;
+    font-family: "Helvetica Neue", Arial, sans-serif;
+        background-color: #3b3030;
+        /* Dark chocolate brown background */
+}
+
+.main-page {
+    max-width: 1200px;
+    margin: auto;
+    padding: 40px;
+    text-align: center;
+    width: 100%;
+        height: 90vh;
+    /* Centered text for titles */
+}
+
+h2 {
+    color: #FFF0D1;
+        /* Soft cream color for heading */
+    margin-bottom: 30px;
+    font-size: 2rem;
+}
+
+.profiles-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+    /* Responsive grid layout */
+}
+
+.user-profile {
+    background-color: #664343;
+        /* Subtle dark brown for profile background */
+        border: 1px solid #5c4b4b;
+        /* Soft brown border */
+    border-radius: 10px;
+    padding: 20px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.user-profile:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+}
+
+.user-profile h3 {
+    margin: 0 0 10px 0;
+    color: #80c1e3;
+        font-size: 45px;
+        /* Muted teal for name headings */
+}
+
+.profile-description {
+    color: #e6c3c9;
+        /* Soft blush pink for profile descriptions */
+    margin-bottom: 15px;
+}
+
+.user-profile ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 10px;
+        color: #ffffff;
+        /* Light color for skills text */
+}
+
+.user-profile ul li {
+    background-color: #d1bfa7;
+        /* Beige background for skill badges */
+    border-radius: 5px;
+    padding: 5px 10px;
+    margin: 5px 5px;
+    display: inline-block;
+    color: #3b3030;
+        /* Darker text color for contrast */
+}
+
+.request-button {
+    background-color: #a37b4a;
+        /* Warm tan color for button */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    transition: background-color 0.3s, transform 0.3s;
+}
+
+.request-button:hover {
+    background-color: #8b6739;
+        /* Darker tan on hover */
+    transform: translateY(-2px);
+}

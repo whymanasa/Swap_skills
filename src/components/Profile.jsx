@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-import { auth } from '../firebase-config'
+import { auth } from '../../firebase-config'
 import { signOut } from 'firebase/auth'
 import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
-import { db } from '../firebase-config'; // Import Firestore
+import { db } from '../../firebase-config'; // Import Firestore
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { FaCheck, FaTimes } from 'react-icons/fa'; // Import the tick and delete icons from react-icons
 import "../styles/Profile.css";

@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase-config'; // Import Firestore
+import { db } from '../../firebase-config'; // Import Firestore
 import { collection, getDocs } from 'firebase/firestore';
+import "../styles/mainpage.css"
 
 const MainPage = ({ currentUserId }) => {
   const [userProfiles, setUserProfiles] = useState([]);
@@ -12,8 +13,7 @@ const MainPage = ({ currentUserId }) => {
         const profilesSnapshot = await getDocs(profilesCollection);
         const profilesList = profilesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        console.log('All profiles:', profilesList); // Log all profiles for debugging
-        console.log('Current user ID:', currentUserId); // Log current user ID for debugging
+        
 
         // Filter out the current user
         const filteredProfiles = profilesList.filter(profile => profile.id !== currentUserId);
@@ -29,22 +29,23 @@ const MainPage = ({ currentUserId }) => {
   }, [currentUserId]);
 
   return (
-    <div>
-      <h2>Other Users' Profiles</h2>
-      {userProfiles.map(profile => (
-        <div key={profile.id} className="user-profile">
-          <h3>{profile.name}</h3>
-          <p>Description: {profile.description}</p>
-          <h4>Skills:</h4>
-          <ul>
-            {profile.skills && profile.skills.map((skill, index) => (
-              <li key={index}>{skill}</li>
-            ))}
-          </ul>
-          <button>send request</button>
-
-        </div>
-      ))}
+    <div className="main-page">
+      <h2>Explore Other Users' Profiles</h2>
+      <div className="profiles-container">
+        {userProfiles.map(profile => (
+          <div key={profile.id} className="user-profile">
+            <h3>{profile.name}</h3>
+            <p className="profile-description">{profile.description}</p>
+            <h4>Skills:</h4>
+            <ul>
+              {profile.skills && profile.skills.map((skill, index) => (
+                <li key={index}>{skill}</li>
+              ))}
+            </ul>
+            <button className="request-button">Send Request</button>
+          </div>
+        ))}
+      </div>
     </div>
   );
 };
