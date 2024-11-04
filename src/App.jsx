@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { BrowserRouter as Router, Routes, Route , Link} from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
 import Home from './components/Home';
 import Footer from './components/footer';
@@ -7,8 +7,8 @@ import SignUp from './components/Sign_up';
 import Profile from './components/Profile';
 import Search from './components/Search.jsx';
 import Message from './components/Message.jsx';
-import { auth } from './firebase-config.jsx'; // Import your Firebase auth
-import { onAuthStateChanged } from 'firebase/auth';
+import { auth } from '../firebase-config.jsx'; // Import your Firebase auth
+import { onAuthStateChanged, signOut } from 'firebase/auth'; // Import signOut
 import ProtectedRoute from './helpers/protectedRoute.jsx';
 import MainPage from './components/MainPage.jsx'; // Update import to MainPage
 import About from './components/About';
@@ -33,12 +33,18 @@ const App = () => {
     return () => unsubscribe(); // Cleanup subscription on unmount
   }, []);
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
+  const handleLogout = async () => {
+    try {
+      await signOut(auth); // Sign out from Firebase
+      setIsAuthenticated(false); // Update authentication state
+      setCurrentUserId(null); // Reset current user ID
+    } catch (error) {
+      console.error('Error signing out: ', error);
+    }
   };
 
-  const handleLogout = () => {
-    setIsAuthenticated(false);
+  const handleLogin = () => {
+    setIsAuthenticated(true); // Update authentication state to true
   };
 
   if (loading) {
@@ -48,16 +54,16 @@ const App = () => {
   return (
     <Router>
       <div>
-        <Navbar isAuthenticated={isAuthenticated} onLogout={handleLogout} />
+        <Navbar isAuthenticated={isAuthenticated} /> {/* Pass isAuthenticated to Navbar */}
         
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/sign-up" element={<SignUp onLogin={handleLogin} />} /> 
+          <Route path="/sign-up" element={<SignUp onLogin={handleLogin} />} /> {/* Pass onLogin function */}
           <Route 
             path="/profile" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Profile onLogout={handleLogout} />
+                <Profile onLogout={handleLogout} /> {/* Pass onLogout function */}
               </ProtectedRoute>
             } 
           />
@@ -65,7 +71,7 @@ const App = () => {
             path="/mainpage" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <MainPage currentUserId={currentUserId} onLogout={handleLogout} /> {/* Pass current user ID */}
+                <MainPage currentUserId={currentUserId} onLogout={handleLogout} /> {/* Pass onLogout function */}
               </ProtectedRoute>
             } 
           />
@@ -73,7 +79,7 @@ const App = () => {
             path="/search" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Search onLogout={handleLogout} currentUserId={currentUserId}/>
+                <Search currentUserId={currentUserId} onLogout={handleLogout} /> {/* Pass onLogout function */}
               </ProtectedRoute>
             } 
           />
@@ -81,15 +87,7 @@ const App = () => {
             path="/message" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Message onLogout={handleLogout} />
-              </ProtectedRoute>
-            } 
-          />
-          <Route 
-            path="/user-profiles" 
-            element={
-              <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <MainPage currentUserId={currentUserId} /> {/* Pass current user ID */}
+                <Message onLogout={handleLogout} /> {/* Pass onLogout function */}
               </ProtectedRoute>
             } 
           />

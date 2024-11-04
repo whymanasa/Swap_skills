@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { db } from '../firebase-config'; // Import Firestore
+import { db } from '../../firebase-config'; // Import Firestore
 import { collection, getDocs } from 'firebase/firestore';
+import "../styles/mainpage.css"
 
 const MainPage = ({ currentUserId }) => {
   const [userProfiles, setUserProfiles] = useState([]);
@@ -12,8 +13,7 @@ const MainPage = ({ currentUserId }) => {
         const profilesSnapshot = await getDocs(profilesCollection);
         const profilesList = profilesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-        console.log('All profiles:', profilesList); // Log all profiles for debugging
-        console.log('Current user ID:', currentUserId); // Log current user ID for debugging
+        
 
         // Filter out the current user
         const filteredProfiles = profilesList.filter(profile => profile.id !== currentUserId);

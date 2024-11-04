@@ -13,13 +13,12 @@ const Navbar = ({ isAuthenticated }) => {
     // Define links based on authentication status
     const links = isAuthenticated
         ? [
-            { to: '/mainpage', label: 'home' },
+            { to: '/mainpage', label: 'Home' },
             { to: '/search', label: 'Search' },
             { to: '/message', label: 'Message' },
             { to: '/profile', label: 'Profile' }
           ]
         : [
-            
             { to: '/', label: 'Home' },
             { to: '/how-it-works', label: 'How it works' },
             { to: '/sign-up', label: 'Sign Up' }
