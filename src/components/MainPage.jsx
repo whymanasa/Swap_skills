@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../../firebase-config'; // Import Firestore
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, addDoc, query, where } from 'firebase/firestore';
 import "../styles/mainpage.css"
 
 const MainPage = ({ currentUserId }) => {
   const [userProfiles, setUserProfiles] = useState([]);
+  const [sentRequests, setSentRequests] = useState([]); // State to hold sent requests
 
   useEffect(() => {
     const fetchUserProfiles = async () => {
@@ -12,8 +13,6 @@ const MainPage = ({ currentUserId }) => {
         const profilesCollection = collection(db, 'profile'); // Reference the 'profile' collection
         const profilesSnapshot = await getDocs(profilesCollection);
         const profilesList = profilesSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-
-        
 
         // Filter out the current user
         const filteredProfiles = profilesList.filter(profile => profile.id !== currentUserId);
@@ -25,8 +24,35 @@ const MainPage = ({ currentUserId }) => {
       }
     };
 
+    const fetchSentRequests = async () => {
+      try {
+        const requestsQuery = query(collection(db, 'Requests'), where('senderId', '==', currentUserId));
+        const requestsSnapshot = await getDocs(requestsQuery);
+        const requestsList = requestsSnapshot.docs.map(doc => doc.data().recipientId); // Get recipient IDs of sent requests
+        setSentRequests(requestsList); // Store recipient IDs in state
+      } catch (error) {
+        console.error('Error fetching sent requests: ', error);
+      }
+    };
+
     fetchUserProfiles();
+    fetchSentRequests();
   }, [currentUserId]);
+
+  // Function to send a request
+  const handleSendRequest = async (recipientId) => {
+    try {
+      await addDoc(collection(db, 'Requests'), {
+        senderId: currentUserId,
+        recipientId: recipientId,
+        status: 'pending',
+      });
+      alert('Request sent!');
+      setSentRequests((prev) => [...prev, recipientId]); // Update sent requests state
+    } catch (error) {
+      console.error('Error sending request: ', error);
+    }
+  };
 
   return (
     <div className="main-page">
@@ -42,7 +68,11 @@ const MainPage = ({ currentUserId }) => {
                 <li key={index}>{skill}</li>
               ))}
             </ul>
-            <button className="request-button">Send Request</button>
+            {sentRequests.includes(profile.id) ? (
+              <button className="request-button" disabled>Request Sent</button> // Disable button if request is sent
+            ) : (
+              <button className="request-button" onClick={() => handleSendRequest(profile.id)}>Send Request</button>
+            )}
           </div>
         ))}
       </div>

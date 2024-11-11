@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { db } from '../../firebase-config'; // Import Firestore
-import { collection, getDocs } from 'firebase/firestore';
+import { collection, getDocs, addDoc } from 'firebase/firestore';
 
 function Search({ currentUserId }) {
   const [searchSkill, setSearchSkill] = useState(''); // State for the search input
@@ -38,6 +38,20 @@ function Search({ currentUserId }) {
     }
   };
 
+  // Function to send a request
+  const handleSendRequest = async (recipientId) => {
+    try {
+      await addDoc(collection(db, 'Requests'), {
+        senderId: currentUserId,
+        recipientId: recipientId,
+        status: 'pending',
+      });
+      alert('Request sent!');
+    } catch (error) {
+      console.error('Error sending request: ', error);
+    }
+  };
+
   return (
     <div>
       <div>
@@ -62,6 +76,7 @@ function Search({ currentUserId }) {
                 <li key={index}>{skill}</li>
               ))}
             </ul>
+            <button className="request-button" onClick={() => handleSendRequest(profile.id)}>Send Request</button>
           </div>
         ))
       ) : (

@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import "../styles/Sign_up.css";
+import { createUserProfile } from '../helpers/Token';
 
 const SignUp = ({ onLogin }) => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [userName, setUserName] = useState("");
   const [error, setError] = useState(null);
   const [isLogin, setIsLogin] = useState(false);
   const navigate = useNavigate();
@@ -16,8 +18,9 @@ const SignUp = ({ onLogin }) => {
     setError(null);
 
     try {
-      await createUserWithEmailAndPassword(auth, email, password);
-      await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userId = userCredential.user.uid;
+      await createUserProfile(userId, userName);
       onLogin();
       navigate('/profile');
     } catch (err) {
@@ -69,6 +72,13 @@ const SignUp = ({ onLogin }) => {
         <form onSubmit={handleSignUp} className="signup-form">
           <h2>Sign Up</h2>
           {error && <p className="error">{error}</p>}
+          <input
+            type="text"
+            value={userName}
+            onChange={(e) => setUserName(e.target.value)}
+            placeholder="Enter your name"
+            required
+          />
           <input
             type="email"
             value={email}
