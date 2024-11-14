@@ -92,9 +92,16 @@ const App = () => {
               </ProtectedRoute>
             } 
           />
+          <Route 
+            path="/chat/:recipientToken" 
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Chat onLogout={handleLogout} currentUserId={currentUserId} /> {/* Pass onLogout function */}
+              </ProtectedRoute>
+            } 
+          />
           <Route path="/how-it-works" element={<About />} />
-          <Route path="/chat/:recipientToken" element={<Chat />} />
-        </Routes>
+          </Routes>
         
       </div>
       <Footer />
