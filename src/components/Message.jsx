@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { db } from '../../firebase-config'; // Import Firestore
-import { collection, query, where, onSnapshot, getDocs, updateDoc, doc, getDoc } from 'firebase/firestore'; // Import Firestore functions
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for navigation
+import { collection, query, where, onSnapshot, getDocs, updateDoc, doc } from 'firebase/firestore'; // Import Firestore functions
+import { useNavigate, Link } from 'react-router-dom'; // Import useNavigate and Link for navigation
 
 function Message({ currentUserId }) {
   const [requests, setRequests] = useState([]);
@@ -27,116 +27,92 @@ function Message({ currentUserId }) {
   useEffect(() => {
     if (!currentUserId) return;
 
-    const receivedRequestsQuery = query(collection(db, 'Requests'), where('recipientId', '==', currentUserId));
-    const sentRequestsQuery = query(collection(db, 'Requests'), where('senderId', '==', currentUserId));
+    const fetchRequests = async () => {
+      const receivedRequestsQuery = query(collection(db, 'Requests'), where('recipientId', '==', currentUserId));
+      const sentRequestsQuery = query(collection(db, 'Requests'), where('senderId', '==', currentUserId));
 
-    const unsubscribeReceived = onSnapshot(receivedRequestsQuery, (querySnapshot) => {
-      const receivedRequestsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setRequests(prev => [...prev, ...receivedRequestsData]);
-    });
+      const receivedRequestsSnapshot = await getDocs(receivedRequestsQuery);
+      const sentRequestsSnapshot = await getDocs(sentRequestsQuery);
 
-    const unsubscribeSent = onSnapshot(sentRequestsQuery, (querySnapshot) => {
-      const sentRequestsData = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-      setRequests(prev => [...prev, ...sentRequestsData]);
-    });
+      const receivedRequestsData = receivedRequestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const sentRequestsData = sentRequestsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
 
-    return () => {
-      unsubscribeReceived();
-      unsubscribeSent();
+      setRequests([...receivedRequestsData, ...sentRequestsData]);
     };
-  }, [currentUserId]);
 
-  const handleChatNavigation = (recipientToken, recipientName) => {
-    navigate(`/chat/${recipientToken}`);
-  };
+    fetchRequests();
+  }, [currentUserId]);
 
   const handleAcceptRequest = async (requestId) => {
     const requestDocRef = doc(db, 'Requests', requestId); // Get the document reference directly
     await updateDoc(requestDocRef, { status: 'accepted' }); // Update the status to accepted
-    const requestSnapshot = await getDoc(requestDocRef); // Get the updated document
-    const requestData = requestSnapshot.data();
-    handleChatNavigation(userProfiles[requestData.senderId].token, userProfiles[requestData.senderId].name);
+    // Refresh requests after accepting
+    fetchRequests();
   };
 
   const handleRejectRequest = async (requestId) => {
     const requestDocRef = doc(db, 'Requests', requestId); // Get the document reference directly
     await updateDoc(requestDocRef, { status: 'rejected' }); // Update the status to rejected
     alert("Request has been rejected.");
+    // Refresh requests after rejecting
+    fetchRequests();
   };
-
-  // Separate requests into different categories
-  const acceptedRequests = requests.filter(request => request.status === 'accepted');
-  const pendingRequests = requests.filter(request => request.status === 'pending');
-  const rejectedRequests = requests.filter(request => request.status === 'rejected');
 
   return (
     <div>
       <h2>Requests</h2>
 
-      {/* Accepted Requests Section */}
-      <h3>Accepted Requests</h3>
-      {acceptedRequests.length > 0 ? (
-        acceptedRequests.map((request) => (
-          <div key={request.id}>
-            <p>
-              Chat with: 
-              {userProfiles[request.senderId] ? (
-                <span style={{ color: 'blue' }}>
+      {/* Received Requests Section */}
+      <h3>Received Requests</h3>
+      {requests.filter(request => request.recipientId === currentUserId).map((request) => (
+        <div key={request.id}>
+          <p>
+            Request from: 
+            {userProfiles[request.senderId] ? (
+              request.status === 'accepted' ? (
+                <Link to={`/chat/${userProfiles[request.senderId].token}`} style={{ color: 'green' }}>
+                  {userProfiles[request.senderId].name}
+                </Link>
+              ) : (
+                <span style={{ color: request.status === 'rejected' ? 'red' : 'black' }}>
                   {userProfiles[request.senderId].name}
                 </span>
-              ) : (
-                <span style={{ color: 'red' }}>Unknown User</span>
-              )}
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>No accepted requests found.</p>
-      )}
+              )
+            ) : (
+              <span style={{ color: 'red' }}>Unknown User</span>
+            )}
+            {request.status === 'pending' && (
+              <>
+                <button onClick={() => handleAcceptRequest(request.id)}>Accept</button>
+                <button onClick={() => handleRejectRequest(request.id)}>Reject</button>
+              </>
+            )}
+          </p>
+        </div>
+      ))}
 
-      {/* Pending Requests Section */}
-      <h3>Pending Requests</h3>
-      {pendingRequests.length > 0 ? (
-        pendingRequests.map((request) => (
-          <div key={request.id}>
-            <p>
-              Request from: 
-              {userProfiles[request.senderId] ? (
-                <span style={{ cursor: 'pointer', color: 'blue' }}>
-                  {userProfiles[request.senderId].name}
-                </span>
+      {/* Sent Requests Section */}
+      <h3>Sent Requests</h3>
+      {requests.filter(request => request.senderId === currentUserId).map((request) => (
+        <div key={request.id}>
+          <p>
+            Request to: 
+            {userProfiles[request.recipientId] ? (
+              request.status === 'accepted' ? (
+                <Link to={`/chat/${userProfiles[request.recipientId].token}`} style={{ color: 'green' }}>
+                  {userProfiles[request.recipientId].name}
+                </Link>
               ) : (
-                <span style={{ color: 'red' }}>Unknown User</span>
-              )}
-              <button onClick={() => handleAcceptRequest(request.id)}>Accept</button>
-              <button onClick={() => handleRejectRequest(request.id)}>Reject</button>
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>No pending requests found.</p>
-      )}
-
-      {/* Rejected Requests Section */}
-      <h3>Rejected Requests</h3>
-      {rejectedRequests.length > 0 ? (
-        rejectedRequests.map((request) => (
-          <div key={request.id}>
-            <p>
-              Request from: 
-              {userProfiles[request.senderId] ? (
-                <span style={{ color: 'blue' }}>
-                  {userProfiles[request.senderId].name}
+                <span style={{ color: request.status === 'rejected' ? 'red' : 'black' }}>
+                  {userProfiles[request.recipientId].name}
                 </span>
-              ) : (
-                <span style={{ color: 'red' }}>Unknown User</span>
-              )}
-            </p>
-          </div>
-        ))
-      ) : (
-        <p>No rejected requests found.</p>
-      )}
+              )
+            ) : (
+              <span style={{ color: 'red' }}>Unknown User</span>
+            )}
+          </p>
+        </div>
+      ))}
     </div>
   );
 }
