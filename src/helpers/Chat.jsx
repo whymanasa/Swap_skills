@@ -2,10 +2,12 @@ import React, { useEffect, useState } from 'react';
 import { db } from '../../firebase-config'; // Import Firestore
 import { useParams } from 'react-router-dom'; // Import useParams to get the recipient token
 import { collection, query, where, onSnapshot, addDoc, getDocs } from 'firebase/firestore';
+import '../styles/Chat.css'; // Import the CSS file
 
 function Chat({ currentUserId }) { // Accept currentUserId as a prop
   const { recipientToken } = useParams(); // Get the recipient token from the URL
   const [recipientId, setRecipientId] = useState(null);
+  const [recipientName, setRecipientName] = useState(''); // State to store recipient's name
   const [messages, setMessages] = useState([]);
   const [messageContent, setMessageContent] = useState('');
 
@@ -16,6 +18,7 @@ function Chat({ currentUserId }) { // Accept currentUserId as a prop
       const profilesSnapshot = await getDocs(profilesQuery);
       profilesSnapshot.forEach((doc) => {
         setRecipientId(doc.id); // Set the recipient ID based on the token
+        setRecipientName(doc.data().name); // Set the recipient's name from the document data
       });
     };
 
@@ -74,22 +77,26 @@ function Chat({ currentUserId }) { // Accept currentUserId as a prop
   };
 
   return (
-    <div>
-      <h2>Chat with {recipientId}</h2>
+    <div className="chat-container">
+      <h2 className="chat-header">Chat with {recipientName}</h2>
       <div>
-        {messages.map((msg) => (
-          <div key={msg.id}>
-            <p><strong>{msg.senderId === currentUserId ? 'You' : msg.senderId}:</strong> {msg.content}</p>
+        {messages.slice().reverse().map((msg) => (
+          <div key={msg.id} className="message">
+            <p className="sender">{msg.senderId === currentUserId ? 'You' : recipientName}:</p>
+            <p>{msg.content}</p>
+            <br/>
           </div>
         ))}
       </div>
-      <input
-        type="text"
-        value={messageContent}
-        onChange={(e) => setMessageContent(e.target.value)}
-        placeholder="Type your message"
-      />
-      <button onClick={handleSendMessage}>Send</button>
+      <div className="input-container">
+        <input
+          type="text"
+          value={messageContent}
+          onChange={(e) => setMessageContent(e.target.value)}
+          placeholder="Type your message"
+        />
+        <button onClick={handleSendMessage}>Send</button>
+      </div>
     </div>
   );
 }
