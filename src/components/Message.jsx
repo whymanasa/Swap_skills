@@ -47,21 +47,18 @@ function Message({ currentUserId }) {
   const handleAcceptRequest = async (requestId) => {
     const requestDocRef = doc(db, 'Requests', requestId); // Get the document reference directly
     await updateDoc(requestDocRef, { status: 'accepted' }); // Update the status to accepted
-    // Refresh requests after accepting
-    fetchRequests();
+    fetchRequests(); // Refresh requests after accepting
   };
 
   const handleRejectRequest = async (requestId) => {
     const requestDocRef = doc(db, 'Requests', requestId); // Get the document reference directly
     await updateDoc(requestDocRef, { status: 'rejected' }); // Update the status to rejected
     alert("Request has been rejected.");
-    // Refresh requests after rejecting
-    fetchRequests();
+    fetchRequests(); // Refresh requests after rejecting
   };
 
   return (
     <div className="requests-container">
-
       {/* Chat Section */}
       <p className="requests-header">Chat</p>
       {requests.filter(request => request.status === 'accepted' && (request.recipientId === currentUserId || request.senderId === currentUserId)).map((request) => (

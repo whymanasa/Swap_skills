@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { db } from '../../firebase-config'; // Import Firestore
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
-import { FaCheck, FaTimes } from 'react-icons/fa'; // Import the tick and delete icons from react-icons
+import { FaTimes } from 'react-icons/fa'; // Import the delete icon from react-icons
 import { createUserProfile } from '../helpers/Token'; // Import createUserProfile
 import "../styles/Profile.css";
 
@@ -99,7 +99,6 @@ function Profile({ onLogout }) {
           onChange={(e) => setName(e.target.value)} 
           placeholder='Enter your name' 
         />
-        <FaCheck onClick={handleProfileUpdate} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
         
         <label>Description</label>
         <input 
@@ -108,7 +107,6 @@ function Profile({ onLogout }) {
           onChange={(e) => setDescription(e.target.value)} 
           placeholder='About yourself' 
         />
-        <FaCheck onClick={handleProfileUpdate} style={{ cursor: 'pointer', color: 'green', marginLeft: '10px' }} /> {/* Tick icon for save */}
         
         <label>Skill</label>
         <input 
@@ -131,9 +129,8 @@ function Profile({ onLogout }) {
             </li>
           ))}
         </ul>
-
+        <button onClick={handleDone}>Done</button>
         <button onClick={handleLogout}>Logout</button>
-        <button onClick={handleDone}>Done</button> {/* Call handleDone on click */}
         {loading && <p>Loading...</p>} {/* Loading indicator */}
       </div>
     </div>
