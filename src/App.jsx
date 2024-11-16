@@ -12,6 +12,7 @@ import { onAuthStateChanged, signOut } from 'firebase/auth'; // Import signOut
 import ProtectedRoute from './helpers/protectedRoute.jsx';
 import MainPage from './components/MainPage.jsx'; // Update import to MainPage
 import About from './components/About';
+import Chat from './helpers/Chat.jsx';
 
 const App = () => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -87,12 +88,20 @@ const App = () => {
             path="/message" 
             element={
               <ProtectedRoute isAuthenticated={isAuthenticated}>
-                <Message onLogout={handleLogout} /> {/* Pass onLogout function */}
+                <Message onLogout={handleLogout} currentUserId={currentUserId} /> {/* Pass onLogout function */}
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/chat/:recipientToken" 
+            element={
+              <ProtectedRoute isAuthenticated={isAuthenticated}>
+                <Chat onLogout={handleLogout} currentUserId={currentUserId} /> {/* Pass onLogout function */}
               </ProtectedRoute>
             } 
           />
           <Route path="/how-it-works" element={<About />} />
-        </Routes>
+          </Routes>
         
       </div>
       <Footer />

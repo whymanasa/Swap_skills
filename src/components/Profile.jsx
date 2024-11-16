@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { db } from '../../firebase-config'; // Import Firestore
 import { doc, updateDoc, getDoc, setDoc } from 'firebase/firestore';
 import { FaCheck, FaTimes } from 'react-icons/fa'; // Import the tick and delete icons from react-icons
+import { createUserProfile } from '../helpers/Token'; // Import createUserProfile
 import "../styles/Profile.css";
 
 function Profile({ onLogout }) {
@@ -32,8 +33,8 @@ function Profile({ onLogout }) {
     const userSnapshot = await getDoc(userDoc)
     if (userSnapshot.exists()) {
       const data = userSnapshot.data()
-      setName(data.name)
-      setDescription(data.description)
+      setName(data.name || '')
+      setDescription(data.description || '')
       setSkillsList(data.skills || [])
     }
     setLoading(false)
@@ -54,11 +55,7 @@ function Profile({ onLogout }) {
         console.log('Profile updated successfully');
       } else {
         // Create a new document if it doesn't exist
-        await setDoc(userDoc, {
-          name,
-          description,
-          skills: skillsList, // Include skills if needed
-        });
+        await createUserProfile(auth.currentUser.uid, name); // Call createUserProfile
         console.log('Profile created successfully');
       }
     } catch (error) {
